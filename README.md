@@ -5,6 +5,8 @@ Some terminal configurations and scripts I use:
 * `custom.terminal`: Terminal configuration
 * `startup.app`: macOS startup "Hide" option fix
 * `zshrc`: zsh configuration, aliases, exports, ...
+* `tvshows_rename.sh`: renames and regroups videos and subtitles
+* `tvshows_move.sh`: copies renamed videos to specified output in a structured way
 
 ## startup.app
 1. Open `startup.app` with `Script editor`
