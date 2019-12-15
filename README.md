@@ -7,6 +7,7 @@ Some terminal configurations and scripts I use:
 * `zshrc`: zsh configuration, aliases, exports, ...
 * `tvshows_rename.sh`: renames and regroups videos and subtitles
 * `tvshows_move.sh`: copies renamed videos to specified output in a structured way
+* `photos_backup.sh`: backs up photos using rsync
 
 ## startup.app
 1. Open `startup.app` with `Script editor`
