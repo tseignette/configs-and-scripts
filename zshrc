@@ -1,10 +1,11 @@
-# Your zshrc path here
-ZSHRC_PATH=''
+ZSHRC_PATH='/Users/thomasseignette/Informatique/Dépôts/Personnel/configs-and-scripts/zshrc'
 
 alias c='clear'
 alias l='ls -GFh'
 alias editrc="nano $ZSHRC_PATH"
 alias reloadrc="source $ZSHRC_PATH"
+alias repo="cd '/Users/thomasseignette/Informatique/Dépôts'"
+alias work="cd '/Users/thomasseignette/Informatique/Dépôts/Travail'"
 
 export CLICOLOR=1
 export LSCOLORS=bxFxCxDxBxegedabagaced
