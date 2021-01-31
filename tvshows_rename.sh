@@ -1,9 +1,12 @@
 #!/bin/bash
 
-
 #===== Config =====#
-SEEN_DIR=''
-RENAMED_DIR=''
+SCRIPT_PATH="`dirname \"$0\"`"
+CONFIG_FILE="$SCRIPT_PATH/tvshows_rename.config"
+TVSHOWS_FILE="$SCRIPT_PATH/tvshows.config"
+RENAMED_DIR="`cat "$CONFIG_FILE" | grep "RENAMED_DIR" | cut -d "=" -f 2`"
+SEEN_DIR="`cat "$CONFIG_FILE" | grep "SEEN_DIR" | cut -d "=" -f 2`"
+declare -a SERIES="`cat $TVSHOWS_FILE`"
 
 
 #===== Setting the right directory =====#
@@ -26,12 +29,6 @@ PURPLE="\033[35m"
 YELLOW="\033[33m"
 GREEN="\033[32m"
 NO_COLOR="\033[0m"
-
-
-#===== Declaring TV series =====#
-declare -a SERIES=(
-	''
-);
 
 
 #===== Functions =====#
@@ -78,15 +75,22 @@ NB_PROBLEMS=0
 for VIDEO in $VIDEOS; do
 	echo -e "$BULLET_POINT1 Taking care of $CYAN\"$VIDEO\"$NO_COLOR..."
 
-	get_series_name "$VIDEO"
-	SERIE=$?
-	if [[ $SERIE -eq 255 ]]; then
+	# Getting serie name
+	SERIE=""
+	for TMP in ${SERIES[@]}; do
+		SERIE_GREP=$(echo -e "$TMP" | sed "s/\./\\\./g" | sed "s/ /.*/g")
+		if [[ `echo -e "$VIDEO" | grep -i "$SERIE_GREP" | wc -l` -eq 1 ]]; then
+			SERIE="$TMP"
+			break
+		fi
+	done
+	if [[ -z $SERIE ]]; then
 		echo -e "$BULLET_POINT2$RED Series name not found, continuing to the next video !" $NO_COLOR
 
 		let "NB_PROBLEMS+=1"
 		continue
 	# else
-	# 	echo -e "$BULLET_POINT2 Series name: ${SERIES[$SERIE]}"
+	# 	echo -e "$BULLET_POINT2 Series name: $SERIE"
 	fi
 
 	SEASON=$(echo -e "$VIDEO" | grep -io "S[0-9][0-9]" | grep -o "[0-9][0-9]") # Getting the season number
@@ -109,10 +113,10 @@ for VIDEO in $VIDEOS; do
 	# 	echo -e "$BULLET_POINT2 Series episode: $EPISODE"
 	fi
 
-	NEW_NAME="${SERIES[$SERIE]} S$SEASON E$EPISODE"
+	NEW_NAME="$SERIE S$SEASON E$EPISODE"
 
 	# Looking for subtitles
-	SERIE_GREP=$(echo -e "${SERIES[$SERIE]}" | sed "s/\./\\\./g" | sed "s/ /.*/g")
+	SERIE_GREP=$(echo -e "$SERIE" | sed "s/\./\\\./g" | sed "s/ /.*/g")
 	SUBTITLES=$(ls | grep -i "$SERIE_GREP.*$SEASON.*$EPISODE.*srt")
 	if [[ `echo -e "$SUBTITLES" | wc -w | tr -d " "` -eq 0 ]]; then
 		NB_SUBTITLES=0
@@ -180,7 +184,7 @@ echo
 echo -e $PURPLE"================ DONE ================" $NO_COLOR
 echo
 
-#Restoring default for separator
+# Restoring default separator
 IFS=$SAVEIFS
 
 exit 0
