@@ -1,8 +1,17 @@
 #! /bin/bash
 
 # Config
-PHOTOS_DIR=''
-BACKUP_DIR=''
+SCRIPT_PATH="`dirname \"$0\"`"
+CONFIG_FILE="$SCRIPT_PATH/photos_backup.config"
+PHOTOS_DIR="`cat "$CONFIG_FILE" | grep "PHOTOS_DIR" | cut -d "=" -f 2`"
+declare -a TARGETS="`cat "$CONFIG_FILE" | grep "TARGETS" | cut -d "=" -f 2`"
+
+# Setting the right directory
+cd "$PHOTOS_DIR"
+
+# Changing separator from space to comma
+SAVEIFS=$IFS
+IFS=$(echo -en ',')
 
 # Constants
 CYAN="\033[36m"
@@ -13,28 +22,27 @@ YELLOW="\033[33m"
 GREEN="\033[32m"
 NO_COLOR="\033[0m"
 
-# Checking if HDD are plugged
-if [ ! -d "$PHOTOS_DIR" ]
-then
-	echo -e $RED"HDD is not plugged!"$NO_COLOR
-	exit 1
-fi
+for TARGET in $TARGETS; do
+	if [ ! -d "$TARGET" ]
+	then
+		echo -e $RED"$TARGET is not plugged!"$NO_COLOR
+	else
+		declare -a FOLDERS=$(ls -d */)
 
-if [ ! -d "$BACKUP_DIR" ]
-then
-	echo -e $RED"Backup HDD is not plugged!"$NO_COLOR
-	exit 1
-fi
+		# Changing separator from space to line break
+		IFS=$(echo -en '\n\b')
 
-function sync_folder {
-	# Syncing
-	echo -e $CYAN"Backing up '$1'..."$NO_COLOR
-	rsync -avh --progress --delete --exclude=".DS_Store" "$PHOTOS_DIR/$1" "$BACKUP_DIR"
-	echo -e $GREEN"Done!"$NO_COLOR
-	echo -e
-}
+		# Syncing
+		for FOLDER in $FOLDERS; do
+			echo -e $CYAN"Backing up '$FOLDER'..."$NO_COLOR
+			rsync -avh --progress --delete --exclude=".DS_Store" --exclude=".Spotlight-V100" "$PHOTOS_DIR/$FOLDER" "$TARGET/$FOLDER"
+			echo -e $GREEN"Done!"$NO_COLOR
+			echo -e
+		done
+	fi
+done
 
-# Backing up
-# e.g. sync_folder "subfolder of $PHOTOS_DIR"
+# Restoring default separator
+IFS=$SAVEIFS
 
 exit 0
