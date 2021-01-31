@@ -1,16 +1,18 @@
 #!/bin/bash
 
 #===== Config =====#
-RENAMED_DIR=''
-MOVED_DIR=''
-OUTPUT_DIR=''
+SCRIPT_PATH="`dirname \"$0\"`"
+CONFIG_FILE="$SCRIPT_PATH/tvshows_move.config"
+MOVED_DIR="`cat "$CONFIG_FILE" | grep "MOVED_DIR" | cut -d "=" -f 2`"
+OUTPUT_DIR="`cat "$CONFIG_FILE" | grep "OUTPUT_DIR" | cut -d "=" -f 2`"
+RENAMED_DIR="`cat "$CONFIG_FILE" | grep "RENAMED_DIR" | cut -d "=" -f 2`"
 
 
 #===== Setting the right directory =====#
 cd "$RENAMED_DIR"
 
 
-#===== Changing for separator from space to line break =====#
+#===== Changing separator from space to line break =====#
 SAVEIFS=$IFS
 IFS=$(echo -en '\n\b')
 
@@ -106,7 +108,7 @@ echo
 echo -e $PURPLE"================ DONE ================" $NO_COLOR
 echo
 
-#Restoring default for separator
+# Restoring default separator
 IFS=$SAVEIFS
 
 exit 0
